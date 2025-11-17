@@ -1,0 +1,18 @@
+{
+  "name": "@template/contracts",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "main": "./build/index.cjs",
+  "scripts": {
+    "build": "tsup",
+    "build:watch": "tsup --watch"
+  },
+  "exports": {
+    "require": "./build/index.cjs",
+    "import": "./build/index.js"
+  },
+  "dependencies": {
+    "zod": "^4.1.12"
+  }
+}
