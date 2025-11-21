@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 import { SendingMailResponseSchema } from '../sending-mail';
-import { EmailSchema, PasswordSchema, TokenSchema } from '../shared.schemas';
+import { EmailSchema, PasswordSchema, TokenSchema, TokenIdSchema } from '../shared.schemas';
 
 export const SignInRequestSchema = z.object({
   email: EmailSchema.shape.email,
@@ -10,7 +10,7 @@ export const SignInRequestSchema = z.object({
 
 export const SignInResponseSchema = z.object({
   accessToken: TokenSchema.shape.token.optional(),
-  twoFactorTokenId: TokenSchema.shape.token.optional(),
+  twoFactorTokenId: TokenIdSchema.shape.tokenId.optional(),
   sentMail: SendingMailResponseSchema.shape.sentMail.optional(),
 });
 
