@@ -1,19 +1,26 @@
-import { User, UserSchema, UserUpdate, UserUpdateSchema } from '@template/contracts';
+import {
+  User,
+  UserSchema,
+  UserUpdate,
+  UserResponseSchema,
+  UserResponse,
+  UserUpdateSchema,
+} from '@template/contracts';
 import { z } from 'zod';
 
 import { router, procedure } from '@/config';
 
 type UserService = {
-  getUserById(userId: User['id']): Promise<Omit<User, 'password' | 'isVerified'>>;
-  updateUser(userId: User['id'], data: UserUpdate): Promise<Omit<User, 'password' | 'isVerified'>>;
+  getUserById(userId: User['id']): Promise<UserResponse>;
+  updateUser(userId: User['id'], data: UserUpdate): Promise<UserResponse>;
 };
 
 export const createUserRouter = (userService: UserService) =>
   router({
     getUserById: procedure
       .input(UserSchema.shape.id)
-      .output(UserSchema.omit({ password: true, isVerified: true }))
-      .mutation(({ input }) => userService.getUserById(input)),
+      .output(UserResponseSchema)
+      .query(({ input }) => userService.getUserById(input)),
     updateUser: procedure
       .input(
         z.object({
@@ -21,7 +28,7 @@ export const createUserRouter = (userService: UserService) =>
           data: UserUpdateSchema,
         }),
       )
-      .output(UserSchema.omit({ password: true, isVerified: true }))
+      .output(UserResponseSchema)
       .mutation(({ input }) => userService.updateUser(input.userId, input.data)),
   });
 
