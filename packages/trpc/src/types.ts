@@ -1,4 +1,4 @@
-import { User } from '@template/contracts';
+import { UserResponse } from '@template/contracts';
 import { TRPCDefaultErrorShape, TRPCError } from '@trpc/server';
 
 import { CreateExpressContextOptions } from '@/server';
@@ -25,10 +25,8 @@ export type ExtendedTRPCError = TRPCError & {
   };
 };
 
-export type UserRequest = Pick<User, 'id' | 'email' | 'name' | 'role'>;
-
 export type DataRequest = {
-  user: UserRequest;
+  user: UserResponse;
   tokenId?: string;
 };
 
@@ -44,4 +42,4 @@ export type ExtendedTrpcContext = {
   res: CreateExpressContextOptions['res'] & ErrorResponse;
   req: CreateExpressContextOptions['req'] & DataRequest;
   info: CreateExpressContextOptions['info'];
-} & CreateExpressContextOptions[];
+} & CreateExpressContextOptions;

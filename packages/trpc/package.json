@@ -1,0 +1,25 @@
+{
+  "name": "@template/trpc",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsup",
+    "build:watch": "tsup --watch"
+  },
+  "exports": {
+    "./server": {
+      "types": "./build/server.d.ts",
+      "default": "./build/server.js"
+    },
+    "./client": {
+      "types": "./build/client.d.ts",
+      "default": "./build/client.js"
+    }
+  },
+  "dependencies": {
+    "@trpc/server": "^11.7.1",
+    "zod": "^4.1.12",
+    "@template/contracts": "workspace:*"
+  }
+}
