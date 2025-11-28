@@ -1,1 +1,8 @@
-export { UserSchema, UserUpdateSchema, type User, type UserUpdate } from './user.schema';
+export {
+  UserSchema,
+  UserUpdateSchema,
+  UserResponseSchema,
+  type User,
+  type UserUpdate,
+  type UserResponse,
+} from './user.schema';

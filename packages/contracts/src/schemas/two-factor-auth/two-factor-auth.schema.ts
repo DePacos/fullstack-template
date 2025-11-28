@@ -1,8 +1,10 @@
 import { z } from 'zod';
 
+import { TokenIdSchema } from '../shared.schemas';
+
 export const TwoFactorAuthRequestSchema = z.object({
-  tokenId: z.uuid(),
-  code: z.string().min(1, { message: 'Code is require' }).max(6, { message: 'Code max value 6' }),
+  tokenId: TokenIdSchema.shape.tokenId,
+  code: z.string().min(6, { message: '' }),
 });
 
 export type TwoFactorAuthRequest = z.infer<typeof TwoFactorAuthRequestSchema>;

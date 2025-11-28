@@ -21,5 +21,8 @@ export const UserUpdateSchema = z.object({
   isTwoFactorEnable: UserSchema.shape.isTwoFactorEnable.optional(),
 });
 
+export const UserResponseSchema = UserSchema.omit({ password: true, isVerified: true });
+
 export type User = z.infer<typeof UserSchema>;
 export type UserUpdate = z.infer<typeof UserUpdateSchema>;
+export type UserResponse = z.infer<typeof UserResponseSchema>;
