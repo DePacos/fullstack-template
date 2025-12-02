@@ -8,3 +8,4 @@ export {
   createPasswordRecoveryRouter,
   type PasswordRecoveryRouter,
 } from './password-recovery.router';
+export { createTwoFactorAuthRouter, type TwoFactorAuthRouter } from './two-factor-auth.router';
