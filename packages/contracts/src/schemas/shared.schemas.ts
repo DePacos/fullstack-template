@@ -36,13 +36,8 @@ const PasswordConfirmationSchema = z
 export const withPasswordConfirmation = <T extends z.ZodRawShape>(base: z.ZodObject<T>) =>
   base.merge(PasswordConfirmationSchema);
 
-export const TokenIdSchema = z.object({
-  tokenId: z.uuid(),
-});
-
-export const TokenSchema = z.object({
-  token: z.string(),
-});
+export const UuidSchema = z.uuid();
+export const TokenSchema = z.string();
 
 export const ResponseSuccessSchema = z.object({
   success: z.boolean(),
@@ -51,6 +46,6 @@ export const ResponseSuccessSchema = z.object({
 export type UserName = z.infer<typeof UserNameSchema>;
 export type Email = z.infer<typeof EmailSchema>;
 export type Password = z.infer<typeof PasswordSchema>;
-export type TokenId = z.infer<typeof TokenIdSchema>;
+export type Uuid = z.infer<typeof UuidSchema>;
 export type Token = z.infer<typeof TokenSchema>;
 export type ResponseSuccess = z.infer<typeof ResponseSuccessSchema>;

@@ -1,9 +1,9 @@
 import { z } from 'zod';
 
-import { UserNameSchema, EmailSchema, PasswordSchema } from '../shared.schemas';
+import { UserNameSchema, EmailSchema, PasswordSchema, UuidSchema } from '../shared.schemas';
 
 export const UserSchema = z.object({
-  id: z.uuid(),
+  id: UuidSchema,
   name: UserNameSchema.shape.name,
   email: EmailSchema.shape.email,
   password: PasswordSchema.shape.password.nullable(),

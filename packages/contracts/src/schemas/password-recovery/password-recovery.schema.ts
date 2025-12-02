@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { EmailSchema, TokenSchema, withPasswordConfirmation } from '../shared.schemas';
+import { EmailSchema, withPasswordConfirmation, TokenSchema } from '../shared.schemas';
 
 export const PasswordRecoveryRequestEmailSchema = z.object({
   email: EmailSchema.shape.email,
@@ -8,7 +8,7 @@ export const PasswordRecoveryRequestEmailSchema = z.object({
 
 export const PasswordRecoveryRequestPasswordSchema = withPasswordConfirmation(
   z.object({
-    token: TokenSchema.shape.token,
+    token: TokenSchema,
   }),
 );
 
