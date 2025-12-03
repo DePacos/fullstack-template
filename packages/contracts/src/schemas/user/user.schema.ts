@@ -1,6 +1,12 @@
 import { z } from 'zod';
 
-import { UserNameSchema, EmailSchema, PasswordSchema, UuidSchema } from '../shared.schemas';
+import {
+  UserNameSchema,
+  EmailSchema,
+  PasswordSchema,
+  UuidSchema,
+  UserRoleSchema,
+} from '../shared.schemas';
 
 export const UserSchema = z.object({
   id: UuidSchema,
@@ -8,7 +14,7 @@ export const UserSchema = z.object({
   email: EmailSchema.shape.email,
   password: PasswordSchema.shape.password.nullable(),
   avatar: z.string().nullable(),
-  role: z.enum(['ADMIN', 'USER']),
+  role: UserRoleSchema,
   isVerified: z.boolean(),
   isTwoFactorEnable: z.boolean(),
   createdAt: z.date(),
