@@ -1,20 +1,21 @@
 import {
+  Token,
+  TokenSchema,
   ResponseSuccess,
   SendingMailResponse,
   PasswordRecoveryRequestEmail,
   PasswordRecoveryRequestEmailSchema,
   PasswordRecoveryRequestPassword,
   PasswordRecoveryRequestPasswordSchema,
-  TokenSchema,
-  Token,
 } from '@template/contracts';
+import { z } from 'zod';
 
 import { router, procedure } from '@/config';
 
 type PasswordRecoveryService = {
   sendPasswordRecoveryLink(data: PasswordRecoveryRequestEmail): Promise<SendingMailResponse>;
   passwordRecovery(data: PasswordRecoveryRequestPassword): Promise<ResponseSuccess>;
-  resentPasswordRecoveryLink(data: Token): Promise<SendingMailResponse>;
+  resentPasswordRecoveryLink(data: Token['token']): Promise<SendingMailResponse>;
 };
 
 export const createPasswordRecoveryRouter = (passwordRecoveryService: PasswordRecoveryService) =>
@@ -26,7 +27,7 @@ export const createPasswordRecoveryRouter = (passwordRecoveryService: PasswordRe
       .input(PasswordRecoveryRequestPasswordSchema)
       .mutation(({ input }) => passwordRecoveryService.passwordRecovery(input)),
     resentPasswordRecoveryLink: procedure
-      .input(TokenSchema)
+      .input(TokenSchema.shape.token)
       .mutation(({ input }) => passwordRecoveryService.resentPasswordRecoveryLink(input)),
   });
 

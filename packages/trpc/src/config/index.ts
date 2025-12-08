@@ -1,2 +1,1 @@
-export { createContext } from './configTrpc';
-export { procedure, router } from './initTrpc';
+export { procedure, router, superjson, protectedProcedure } from './initTrpc';

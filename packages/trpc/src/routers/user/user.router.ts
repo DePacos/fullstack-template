@@ -8,20 +8,20 @@ import {
 } from '@template/contracts';
 import { z } from 'zod';
 
-import { router, procedure } from '@/config';
+import { router, protectedProcedure } from '@/config';
 
 type UserService = {
-  getUserById(userId: User['id']): Promise<UserResponse>;
+  getUserById(userId: User['id']): Promise<UserResponse | null>;
   updateUser(userId: User['id'], data: UserUpdate): Promise<UserResponse>;
 };
 
 export const createUserRouter = (userService: UserService) =>
   router({
-    getUserById: procedure
+    getUserById: protectedProcedure
       .input(UserSchema.shape.id)
-      .output(UserResponseSchema)
+      .output(UserResponseSchema.nullable())
       .query(({ input }) => userService.getUserById(input)),
-    updateUser: procedure
+    updateUser: protectedProcedure
       .input(
         z.object({
           userId: UserSchema.shape.id,

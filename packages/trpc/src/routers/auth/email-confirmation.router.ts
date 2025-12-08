@@ -8,7 +8,7 @@ import {
 } from '@template/contracts';
 
 import { router, procedure } from '@/config';
-import { CreateExpressContextOptions } from '@/server';
+import { CreateExpressContextOptions } from '@/shared';
 
 type Response = CreateExpressContextOptions['res'];
 

@@ -8,18 +8,20 @@ import {
   SignUpRequest,
   SignUpRequestSchema,
   Uuid,
+  UserResponse,
+  UserResponseSchema,
 } from '@template/contracts';
 
-import { procedure, router } from '@/config';
-import { CreateExpressContextOptions } from '@/server';
+import { procedure, protectedProcedure, router } from '@/config';
+import { CreateExpressContextOptions } from '@/shared';
 
 type Response = CreateExpressContextOptions['res'];
 
 export type AuthService = {
   register(data: SignUpRequest): Promise<SendingMailResponse>;
   login(data: SignInRequest, res: Response): Promise<SignInResponse>;
-  logout(tokenId, res: Response): Promise<void>;
-  update(userId: Uuid, tokenId: Uuid, res: Response): Promise<void>;
+  logout(tokenId: Uuid | undefined, res: Response): Promise<void>;
+  update(userId: Uuid, tokenId: Uuid | undefined, res: Response): Promise<void>;
 };
 
 export const createAuthRouter = (authService: AuthService) =>
@@ -32,12 +34,13 @@ export const createAuthRouter = (authService: AuthService) =>
       .input(SignInRequestSchema)
       .output(SignInResponseSchema)
       .mutation(({ ctx, input }) => authService.login(input, ctx.res)),
-    logout: procedure.mutation(({ ctx }) => authService.logout(ctx.req.tokenId, ctx.res)),
-    me: procedure.query(({ ctx }) => {
+    logout: protectedProcedure.mutation(({ ctx }) => authService.logout(ctx.req.tokenId, ctx.res)),
+    me: protectedProcedure.output(UserResponseSchema).query(({ ctx }): UserResponse => {
       return ctx.req.user;
     }),
-    update: procedure.mutation(({ ctx }) => {
+    update: protectedProcedure.mutation(({ ctx }) => {
       return authService.update(ctx.req.user.id, ctx.req.tokenId, ctx.res);
     }),
   });
+
 export type AuthRouter = ReturnType<typeof createAuthRouter>;
