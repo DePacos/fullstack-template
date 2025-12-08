@@ -4,6 +4,7 @@
     "module": "esnext",
     "target": "es2020",
     "outDir": "./build",
+    "strict": true,
     "paths": {
       "@/*": ["./src/*"]
     }

@@ -1,45 +1,23 @@
-import { UserResponse } from '@template/contracts';
-import { TRPCDefaultErrorShape, TRPCError } from '@trpc/server';
+import { UserResponse, User, Uuid, Jwt } from '@template/contracts';
 
-import { CreateExpressContextOptions } from '@/server';
-
-export type ExtendedRouterBuilder = {
-  ctx: object;
-  meta: object;
-  errorShape: ExtendedErrorShape;
-  transformer: false;
-};
-
-export type ExtendedErrorShape = TRPCDefaultErrorShape & {
-  data: TRPCDefaultErrorShape['data'] & {
-    message?: string;
-    serverHttpStatus?: number;
-    exceptionValue?: string;
-  };
-};
-
-export type ExtendedTRPCError = TRPCError & {
-  cause?: {
-    status?: number;
-    response?: { message?: string; value?: string };
-  };
-};
+import { CreateExpressContextOptions } from '@/shared';
 
 export type DataRequest = {
   user: UserResponse;
   tokenId?: string;
 };
 
-export type ErrorResponse = {
-  error?: {
-    message?: string;
-    error?: TRPCError['code'];
-    statusCode: number;
+type ContextServices = {
+  userService: {
+    getUserById: (userId: Uuid) => Promise<User | null>;
+  };
+  tokensService: {
+    verifyAccessToken: (token: Jwt) => Promise<{ userId: Uuid; tokenId: Uuid }>;
+    verifyRefreshToken: (token: Jwt) => Promise<{ userId: Uuid; tokenId: Uuid }>;
   };
 };
 
 export type ExtendedTrpcContext = {
-  res: CreateExpressContextOptions['res'] & ErrorResponse;
   req: CreateExpressContextOptions['req'] & DataRequest;
-  info: CreateExpressContextOptions['info'];
+  services: ContextServices;
 } & CreateExpressContextOptions;

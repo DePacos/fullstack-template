@@ -12,13 +12,15 @@
       "types": "./build/server.d.ts",
       "default": "./build/server.js"
     },
-    "./client": {
-      "types": "./build/client.d.ts",
-      "default": "./build/client.js"
+    "./shared": {
+      "types": "./build/shared.d.ts",
+      "default": "./build/shared.js"
     }
   },
   "dependencies": {
+    "@trpc/client": "^11.7.1",
     "@trpc/server": "^11.7.1",
+    "superjson": "^2.2.6",
     "zod": "^4.1.12",
     "@template/contracts": "workspace:*"
   }

@@ -1,6 +1,3 @@
-export {
-  createExpressMiddleware,
-  type CreateExpressContextOptions,
-} from '@trpc/server/adapters/express';
-export { observable, type Observer } from '@trpc/server/observable';
-export { TRPCError } from '@trpc/server';
+export { router, procedure } from './config';
+export * from './routers';
+export { ExtendedTrpcContext } from './types';
