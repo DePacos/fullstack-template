@@ -1,5 +1,6 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Uuid, Email, SignInResponse, TwoFactorAuthRequest } from '@template/contracts';
+import { TRPCError } from '@template/trpc/shared';
 import { Response } from 'express';
 
 import { TokensService } from '@/auth/tokens';
@@ -81,7 +82,7 @@ export class TwoFactorAuthService {
 
   public async resendMailTwoFactorAuth(tokenId: Uuid) {
     const foundTokenRow = await this.tokensService.getTokenById(tokenId);
-    if (!foundTokenRow) throw new NotFoundException('Token not found');
+    if (!foundTokenRow) throw new TRPCError({ message: 'Token not found', code: 'NOT_FOUND' });
     await this.tokensService.removeToken(tokenId);
 
     return this.sendMailTwoFactorAuth(foundTokenRow.userId, foundTokenRow.email);

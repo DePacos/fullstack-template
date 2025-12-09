@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { createEmailConfirmationRouter } from '@template/trpc/client';
+import { createEmailConfirmationRouter } from '@template/trpc/server';
 
 import { TokensModule } from '@/auth/tokens';
 import { MailModule } from '@/mail';

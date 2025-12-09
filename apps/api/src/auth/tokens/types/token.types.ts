@@ -1,10 +1,10 @@
-import { TokenType, Uuid, Email } from '@template/contracts';
+import { Token, Uuid, Email } from '@template/contracts';
 
 export type SaveTokenData = {
   id: Uuid;
   userId: Uuid;
   email: Email['email'];
   token: string;
-  tokenType: TokenType;
+  tokenType: Token['type'];
   tokenTtl: number;
 };

@@ -29,7 +29,7 @@ export class EmailConfirmationService {
     email: Email['email'],
     tokenId?: Uuid,
   ): Promise<SendingMailResponse> {
-    const BASE_URL = this.configService.get<string>('FRONT_APPLICATION_URL');
+    const BASE_URL = this.configService.getOrThrow<string>('FRONT_APPLICATION_URL');
 
     tokenId && (await this.tokensService.removeToken(tokenId));
     const { verifierToken, verifierTokenId, verifierTtl } = this.tokensService.getVerifyToken();

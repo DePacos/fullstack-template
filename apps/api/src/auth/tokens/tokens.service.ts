@@ -1,12 +1,7 @@
-import {
-  BadRequestException,
-  ConflictException,
-  Injectable,
-  NotFoundException,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { Uuid, TokenType, Jwt } from '@template/contracts';
+import { Uuid, Token, Jwt } from '@template/contracts';
+import { TRPCError } from '@template/trpc/shared';
 import * as argon2 from 'argon2';
 import { jwtVerify, SignJWT } from 'jose';
 import { createHash, createSecretKey, randomBytes, randomUUID } from 'node:crypto';
@@ -43,11 +38,11 @@ export class TokensService {
     return createHash(alg).update(value).digest().toString(encoding);
   }
 
-  public async getTokenById(tokenId: Uuid) {
+  public async getTokenById(tokenId: Uuid): Promise<Token | null> {
     return this.prismaService.token.findUnique({ where: { id: tokenId } });
   }
 
-  public async getTokenByUserIdTokenType(userId: Uuid, tokenType: TokenType) {
+  public async getTokenByUserIdTokenType(userId: Uuid, tokenType: Token['type']) {
     return this.prismaService.token.findUnique({
       where: { user_type_unique: { userId, type: tokenType } },
     });
@@ -104,11 +99,11 @@ export class TokensService {
     try {
       const { payload } = await jwtVerify(token, key, { clockTolerance: '5s' });
       if (!payload?.userId || !payload?.jti)
-        throw new UnauthorizedException('Token payload invalid');
+        throw new TRPCError({ message: 'Token invalid', code: 'UNAUTHORIZED' });
 
-      return { userId: payload.userId as string, refreshTokenId: payload.jti };
-    } catch {
-      throw new UnauthorizedException('AccessToken invalid');
+      return { userId: payload.userId as string, tokenId: payload.jti };
+    } catch (error) {
+      throw new TRPCError({ message: error.message, code: 'UNAUTHORIZED' });
     }
   }
 
@@ -118,17 +113,20 @@ export class TokensService {
     try {
       const { payload } = await jwtVerify(token, key, { clockTolerance: '5s' });
       if (!payload?.userId || !payload?.jti)
-        throw new UnauthorizedException('Token payload invalid');
+        throw new TRPCError({ message: 'Token payload invalid', code: 'UNAUTHORIZED' });
 
-      return this.verifyToken(token, payload.jti);
+      const { foundTokenRow } = await this.verifyToken(token, payload.jti);
+
+      return { userId: foundTokenRow.userId, tokenId: foundTokenRow.id };
     } catch {
-      throw new UnauthorizedException('RefreshToken invalid');
+      throw new TRPCError({ message: 'RefreshToken invalid', code: 'UNAUTHORIZED' });
     }
   }
 
   public async verifyConfirmationToken(token: string, isExpires?: boolean) {
     const [tokenData, tokenId] = token.split('.');
-    if (!tokenData || !tokenId) throw new BadRequestException('Token invalid');
+    if (!tokenData || !tokenId)
+      throw new TRPCError({ message: 'Token invalid', code: 'BAD_REQUEST' });
 
     return await this.verifyToken(tokenData, tokenId, isExpires);
   }
@@ -139,14 +137,18 @@ export class TokensService {
     //todo make multiple input attempts
 
     if (!foundTokenRow) {
-      throw new ConflictException('Token not found');
+      throw new TRPCError({ message: 'Token not found', code: 'NOT_FOUND' });
     }
 
     if (!(await argon2.verify(foundTokenRow.token, token))) {
-      throw new ConflictException('Token not verified');
+      throw new TRPCError({ message: 'Token not verified', code: 'BAD_REQUEST' });
     }
     if (isExpires && foundTokenRow.expiresAt < new Date()) {
-      throw new ConflictException({ message: 'Token expired', value: foundTokenRow.email });
+      throw new TRPCError({
+        message: 'Token expired',
+        code: 'BAD_REQUEST',
+        cause: foundTokenRow.email,
+      });
     }
 
     return { foundTokenRow };
@@ -173,7 +175,7 @@ export class TokensService {
     const token = await this.prismaService.token.findUnique({
       where: { id: tokenId },
     });
-    if (!token) throw new NotFoundException('Token not found');
+    if (!token) throw new TRPCError({ message: 'Token not found', code: 'NOT_FOUND' });
 
     await this.prismaService.token.delete({ where: { id: tokenId } });
   }
