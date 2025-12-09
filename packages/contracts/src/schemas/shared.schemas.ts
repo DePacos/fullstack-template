@@ -37,14 +37,21 @@ export const withPasswordConfirmation = <T extends z.ZodRawShape>(base: z.ZodObj
   base.merge(PasswordConfirmationSchema);
 
 export const UuidSchema = z.uuid();
-export const TokenSchema = z.string();
 export const JwtSchema = z.jwt();
+export const TokenSchema = z.object({
+  id: UuidSchema,
+  email: EmailSchema.shape.email,
+  token: z.string(),
+  type: z.enum(['VERIFICATION', 'TWO_FACTOR', 'PASSWORD_RESET', 'REFRESH']),
+  createdAt: z.date(),
+  expiresAt: z.date(),
+  userId: UuidSchema,
+});
 
 export const ResponseSuccessSchema = z.object({
   success: z.boolean(),
 });
 
-export const TokenTypeSchema = z.enum(['VERIFICATION', 'TWO_FACTOR', 'PASSWORD_RESET', 'REFRESH']);
 export const UserRoleSchema = z.enum(['ADMIN', 'USER']);
 export const AuthTypeSchema = z.enum(['CREDENTIALS', 'OAUTH']);
 export const AuthProviderSchema = z.enum(['LOCAL', 'GOOGLE', 'YANDEX']);
@@ -56,7 +63,6 @@ export type Uuid = z.infer<typeof UuidSchema>;
 export type Token = z.infer<typeof TokenSchema>;
 export type Jwt = z.infer<typeof JwtSchema>;
 export type ResponseSuccess = z.infer<typeof ResponseSuccessSchema>;
-export type TokenType = z.infer<typeof TokenTypeSchema>;
 export type UserRole = z.infer<typeof UserRoleSchema>;
 export type AuthProvider = z.infer<typeof AuthProviderSchema>;
 export type AuthType = z.infer<typeof AuthTypeSchema>;

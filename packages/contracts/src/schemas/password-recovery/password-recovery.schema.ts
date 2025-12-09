@@ -8,7 +8,7 @@ export const PasswordRecoveryRequestEmailSchema = z.object({
 
 export const PasswordRecoveryRequestPasswordSchema = withPasswordConfirmation(
   z.object({
-    token: TokenSchema,
+    token: TokenSchema.shape.token,
   }),
 );
 
