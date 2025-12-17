@@ -1,32 +1,27 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { User } from '@template/contracts';
+import { Injectable } from '@nestjs/common';
+import { Uuid, Email, SignUpRequest, UserUpdate, AuthProvider, User } from '@template/contracts';
 import * as argon2 from 'argon2';
 
-import { RegisterRequestDto } from '@/auth/dto';
+import { ProviderUserData } from '@/auth/provider/types';
 import { PrismaService } from '@/prisma';
-import { UserUpdateRequestDto } from '@/user/dto';
 
 @Injectable()
 export class UserService {
   public constructor(private readonly prismaService: PrismaService) {}
-
-  public async getUserById(id: User['id']) {
-    const user = await this.prismaService.user.findUnique({
+  public async getUserById(id: Uuid): Promise<User | null> {
+    return this.prismaService.user.findUnique({
       where: { id },
     });
-
-    if (!user) throw new NotFoundException('User not found');
-
-    return user;
   }
 
-  public async getUserByEmail(email: string) {
+  public async getUserByEmail(email: Email['email']) {
     return this.prismaService.user.findUnique({
       where: { email },
+      include: { account: true },
     });
   }
 
-  public async createUser(data: Omit<RegisterRequestDto, 'passwordConfirmation'>) {
+  public async createUser(data: Omit<SignUpRequest, 'passwordConfirmation'>) {
     const { name, email, password } = data;
 
     return this.prismaService.user.create({
@@ -42,18 +37,45 @@ export class UserService {
     });
   }
 
-  public async updateUser(id: string, data: UserUpdateRequestDto) {
+  public async createUserByProvider(data: ProviderUserData) {
+    const { name, email, provider } = data;
+    return this.prismaService.user.create({
+      data: {
+        name,
+        email,
+        isVerified: true,
+        account: {
+          create: {
+            type: 'OAUTH',
+            provider,
+          },
+        },
+      },
+    });
+  }
+
+  public async createAccountByProvider(userId: string, provider: AuthProvider) {
+    await this.prismaService.account.create({
+      data: {
+        userId,
+        type: 'OAUTH',
+        provider,
+      },
+    });
+  }
+
+  public async updateUser(id: Uuid, data: UserUpdate) {
     return this.prismaService.user.update({
       where: { id },
       data,
     });
   }
 
-  public async verifyUser(id: string) {
+  public async verifyUser(id: Uuid) {
     await this.prismaService.user.update({ where: { id }, data: { isVerified: true } });
   }
 
-  public async changePassword(id: string, newPassword: string) {
+  public async changePassword(id: Uuid, newPassword: string) {
     const passwordHash = await argon2.hash(newPassword);
     await this.prismaService.user.update({
       where: { id },
