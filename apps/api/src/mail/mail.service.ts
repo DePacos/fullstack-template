@@ -3,6 +3,7 @@ import { render } from '@react-email/components';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { SendingMailResponse, Email } from '@template/contracts';
+import { TRPCError } from '@template/trpc/shared';
 
 import {
   ConfirmationTemplate,
@@ -23,7 +24,7 @@ export class MailService {
     subject: string,
     html: string,
   ): Promise<SendingMailResponse> {
-    const name = this.configService.getOrThrow<string>('APPLICATION_NAME');
+    const name = this.configService.getOrThrow<string>('APP_NAME');
     const address = this.configService.getOrThrow<string>('MAIL_LOGIN');
 
     try {
@@ -34,8 +35,8 @@ export class MailService {
         html,
       });
       return { sentMail: true };
-    } catch {
-      return { sentMail: false };
+    } catch (error) {
+      throw new TRPCError({ message: 'Error sending email, please try later', code: 'CONFLICT' });
     }
   }
 

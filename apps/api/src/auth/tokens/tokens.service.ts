@@ -93,13 +93,11 @@ export class TokensService {
     return { twoFactorTokenId, twoFactorToken, twoFactorTtl };
   }
 
-  public async verifyAccessToken(token: Jwt) {
+  public async jwtVerifyToken(token: Uuid) {
     const key = this.getSecretKey();
-
     try {
       const { payload } = await jwtVerify(token, key, { clockTolerance: '5s' });
-      if (!payload?.userId || !payload?.jti)
-        throw new TRPCError({ message: 'Token invalid', code: 'UNAUTHORIZED' });
+      if (!payload?.userId || !payload?.jti) throw new Error('Token invalid');
 
       return { userId: payload.userId as string, tokenId: payload.jti };
     } catch (error) {
@@ -107,20 +105,15 @@ export class TokensService {
     }
   }
 
+  public async verifyAccessToken(token: Jwt) {
+    return await this.jwtVerifyToken(token);
+  }
+
   public async verifyRefreshToken(token: Jwt) {
-    const key = this.getSecretKey();
+    const { tokenId } = await this.jwtVerifyToken(token);
+    const { foundTokenRow } = await this.verifyToken(token, tokenId);
 
-    try {
-      const { payload } = await jwtVerify(token, key, { clockTolerance: '5s' });
-      if (!payload?.userId || !payload?.jti)
-        throw new TRPCError({ message: 'Token payload invalid', code: 'UNAUTHORIZED' });
-
-      const { foundTokenRow } = await this.verifyToken(token, payload.jti);
-
-      return { userId: foundTokenRow.userId, tokenId: foundTokenRow.id };
-    } catch {
-      throw new TRPCError({ message: 'RefreshToken invalid', code: 'UNAUTHORIZED' });
-    }
+    return { userId: foundTokenRow.userId, tokenId: foundTokenRow.id };
   }
 
   public async verifyConfirmationToken(token: string, isExpires?: boolean) {

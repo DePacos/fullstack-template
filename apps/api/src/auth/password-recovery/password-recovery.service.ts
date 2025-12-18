@@ -29,7 +29,7 @@ export class PasswordRecoveryService {
     const user = await this.userService.getUserByEmail(data.email);
     if (!user) throw new TRPCError({ message: 'User not exists', code: 'NOT_FOUND' });
 
-    const BASE_URL = this.configService.getOrThrow<string>('FRONT_APPLICATION_URL');
+    const BASE_URL = this.configService.getOrThrow<string>('FRONT_APP_URL');
 
     const foundTokenRow = await this.tokenService.getTokenByUserIdTokenType(
       user.id,
