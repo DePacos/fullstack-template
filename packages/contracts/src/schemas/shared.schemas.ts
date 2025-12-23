@@ -23,7 +23,7 @@ export const PasswordSchema = z.object({
     .refine((value) => PASSWORD_REGEX.test(value), { message: 'Password format invalid' }),
 });
 
-const PasswordConfirmationSchema = z
+export const PasswordConfirmationSchema = z
   .object({
     password: PasswordSchema.shape.password,
     passwordConfirmation: z.string(),
@@ -32,9 +32,6 @@ const PasswordConfirmationSchema = z
     message: 'Passwords do not match',
     path: ['passwordConfirmation'],
   });
-
-export const withPasswordConfirmation = <T extends z.ZodRawShape>(base: z.ZodObject<T>) =>
-  base.merge(PasswordConfirmationSchema);
 
 export const UuidSchema = z.uuid();
 export const JwtSchema = z.jwt();
@@ -59,6 +56,7 @@ export const AuthProviderSchema = z.enum(['LOCAL', 'GOOGLE', 'YANDEX']);
 export type UserName = z.infer<typeof UserNameSchema>;
 export type Email = z.infer<typeof EmailSchema>;
 export type Password = z.infer<typeof PasswordSchema>;
+export type PasswordConfirmation = z.infer<typeof PasswordConfirmationSchema>;
 export type Uuid = z.infer<typeof UuidSchema>;
 export type Token = z.infer<typeof TokenSchema>;
 export type Jwt = z.infer<typeof JwtSchema>;
